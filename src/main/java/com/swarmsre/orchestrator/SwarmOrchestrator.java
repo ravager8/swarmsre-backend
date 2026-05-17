@@ -6,14 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
-import static reactor.netty.http.HttpConnectionLiveness.log;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SwarmOrchestrator {
 
-    private ChatClient chatClient;
+    private final ChatClient chatClient;
 
     public void processIncidentAsync(IncidentEvent event) {
         log.info("Orchestrator triggered for Incident: {}", event.getIncidentId());

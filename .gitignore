@@ -31,3 +31,30 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### SwarmSRE — secrets and local config ###
+# Never commit anything containing real credentials
+application-local.properties
+application-local.yml
+application-secrets.properties
+application-secrets.yml
+src/main/resources/application-local.*
+src/main/resources/application-secrets.*
+
+### Environment files ###
+.env
+.env.*
+!.env.example
+
+### Logs ###
+*.log
+logs/
+log/
+
+### OS noise ###
+.DS_Store
+Thumbs.db
+
+### Local ignores (per-developer) ###
+# Use this for anything you want ignored only on your machine
+.gitignore.local

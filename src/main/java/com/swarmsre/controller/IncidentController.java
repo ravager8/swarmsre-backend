@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class IncidentController {
 
-    private SwarmOrchestrator orchestrator;
+    private final SwarmOrchestrator orchestrator;
 
     @PostMapping("/webhook")
     public ResponseEntity<String> receiveIncident(@RequestBody IncidentEvent event) {
