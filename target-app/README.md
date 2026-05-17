@@ -1,8 +1,10 @@
-# swarmsre-backend
+# target-app
 
-Fake target application for the **SwarmSRE** hackathon project. This service plays the role of a "production app" that experiences incidents — it generates logs, exposes metrics, and accepts incident webhooks. It is **not** the AI orchestrator (that lives in a separate project).
+Fake target application for the **SwarmSRE** hackathon project. This service plays the role of a "production app" that experiences incidents — it generates logs, exposes metrics, and accepts incident webhooks. It is **not** the AI orchestrator (that lives in `../orchestrator/`).
 
 This README is written so a fresh Claude Code session (or any developer) can clone the repo, verify the environment, and have the app running locally end-to-end without external context.
+
+> **Where you are in the repo:** this README documents the `target-app/` subdirectory of the `swarmsre-backend` monorepo. All paths and commands below are relative to `target-app/` unless explicitly noted. See the top-level [`README.md`](../README.md) for the broader repo layout.
 
 ---
 
@@ -22,7 +24,7 @@ It does **not** yet:
 - Talk to MongoDB or Cosmos DB
 - Forward the Alertmanager webhook to a real orchestrator (alertmanager.yml uses a placeholder URL)
 
-These are planned and tracked in `Swarm-Agents/Hackathon_Project/TEAM_PLAN.md` (sibling docs project).
+These are planned and tracked in [`../project-docs/TEAM_PLAN.md`](../project-docs/TEAM_PLAN.md).
 
 ---
 
@@ -90,8 +92,10 @@ If missing, install from https://brew.sh.
 
 ## Project layout
 
+This subdirectory contains the target app only. The wider repo also has `orchestrator/`, `frontend/`, and `project-docs/` siblings — see the top-level README for the full picture.
+
 ```
-swarmsre-backend/
+target-app/                                  ← you are here
 ├── pom.xml                                Maven build, Spring Boot 3.5.x, Java 21
 ├── mvnw, mvnw.cmd                         Maven Wrapper
 ├── infra/
@@ -116,6 +120,8 @@ swarmsre-backend/
 └── src/test/java/com/swarmsre/AgentApplicationTests.java
 ```
 
+> **Naming note:** the top-level `SwarmOrchestrator.java` here is a leftover stub from before the orchestrator was split into its own project. It will eventually be removed; the real AI orchestration lives in `../orchestrator/`.
+
 ---
 
 ## Running the app — Level 1 (just the backend)
@@ -124,7 +130,7 @@ This runs the Spring Boot app and exposes its metrics endpoint. **No Docker requ
 
 ### Step 1: Build
 
-From the `swarmsre-backend/` directory:
+From the `target-app/` directory (i.e., `cd target-app/` after cloning):
 
 ```bash
 ./mvnw clean package -DskipTests
@@ -569,7 +575,12 @@ docker stop swarmsre-prometheus swarmsre-alertmanager
 
 ## Where to look for more context
 
-- `Swarm-Agents/Hackathon_Project/COMPONENTS.md` — full system architecture
-- `Swarm-Agents/Hackathon_Project/TEAM_PLAN.md` — three-person execution plan and contracts
-- `Swarm-Agents/Hackathon_Project/TEAM_QA.md` — design decisions and Q&A history
-- `docs/examples/sample-startup-and-alert-simulation.log` — reference output of a healthy run including a fired alert
+All paths below are relative to the **repo root** (one level up from this README):
+
+- [`README.md`](../README.md) — top-level repo orientation
+- [`project-docs/COMPONENTS.md`](../project-docs/COMPONENTS.md) — full system architecture
+- [`project-docs/TEAM_PLAN.md`](../project-docs/TEAM_PLAN.md) — three-person execution plan and contracts
+- [`project-docs/TEAM_QA.md`](../project-docs/TEAM_QA.md) — design decisions and Q&A history
+- `docs/examples/sample-startup-and-alert-simulation.log` (relative to this README) — reference output of a healthy run including a fired alert
+- `../orchestrator/` — the AI service that will receive Alertmanager webhooks (currently empty)
+- `../frontend/` — the Next.js dashboard (currently empty)
