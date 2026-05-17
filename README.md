@@ -11,13 +11,16 @@ This README is written so a fresh Claude Code session (or any developer) can clo
 - Exposes `POST /api/incident/webhook` to receive a standardized `IncidentEvent` JSON payload
 - Returns `202 Accepted` immediately and dispatches to a stub orchestrator on a background thread
 - Exposes `/actuator/prometheus` with JVM, HTTP, disk, and tagged application metrics in Prometheus text format
+- Exposes `POST /api/simulate/error` to increment a custom `payment_errors_total` counter — used to drive demo incidents and trigger Prometheus alerts
 - Runs an in-memory H2 database (currently unused — JPA scaffolding is in place for future log persistence)
+- Ships with `infra/` configs for Prometheus + Alertmanager so the full alert-firing pipeline can run locally via Docker
 
 It does **not** yet:
 - Call any LLM (Spring AI is wired with dummy credentials; the orchestrator method is a stub)
-- Generate fake logs on a schedule
-- Simulate incident scenarios via business metrics
+- Generate fake logs on a schedule (only error-counter simulation today)
+- Persist logs or incident records (no JPA entities yet)
 - Talk to MongoDB or Cosmos DB
+- Forward the Alertmanager webhook to a real orchestrator (alertmanager.yml uses a placeholder URL)
 
 These are planned and tracked in `Swarm-Agents/Hackathon_Project/TEAM_PLAN.md` (sibling docs project).
 
@@ -92,13 +95,21 @@ swarmsre-backend/
 ├── pom.xml                                Maven build, Spring Boot 3.5.x, Java 21
 ├── mvnw, mvnw.cmd                         Maven Wrapper
 ├── infra/
-│   └── prometheus.yml                     Prometheus scrape config (used by Docker)
+│   ├── prometheus.yml                     Prometheus scrape + rules + alertmanager config
+│   ├── rules.yml                          Alert rules (e.g., HighPaymentErrorRate)
+│   └── alertmanager.yml                   Webhook routing config (placeholder URL today)
+├── docs/examples/
+│   ├── README.md                          What the sample artifacts demonstrate
+│   └── sample-startup-and-alert-simulation.log   Reference output of a healthy run
 ├── src/main/java/com/swarmsre/
 │   ├── AgentApplication.java              Spring Boot entry point
 │   ├── config/AiConfig.java               ChatClient bean (currently uses dummy creds)
 │   ├── controller/IncidentController.java POST /api/incident/webhook
 │   ├── dto/IncidentEvent.java             Webhook payload DTO
 │   ├── orchestrator/SwarmOrchestrator.java Stub — logs incident ID, no AI yet
+│   ├── simulator/
+│   │   ├── IncidentSimulatorService.java  Custom Micrometer counter: payment_errors_total
+│   │   └── SimulationController.java      POST /api/simulate/error
 │   └── tool/SystemTools.java              Mock fetchLogs tool registered with Spring AI
 ├── src/main/resources/
 │   └── application.properties             Server port, Prometheus exposure, dummy AI config, H2
@@ -283,6 +294,116 @@ docker start swarmsre-prometheus
 
 ---
 
+## Running the app — Level 3 (full alert pipeline with Alertmanager)
+
+This adds a second container — Alertmanager — which receives firing alerts from
+Prometheus and dispatches them as webhooks. **Requires Levels 1 and 2 first.**
+
+### Prerequisites
+
+- Spring Boot app running on port 8080 (Level 1)
+- Prometheus container running on port 9090 (Level 2)
+- `infra/rules.yml` defines the alert rule (already in repo)
+- `infra/alertmanager.yml` defines the webhook receiver (already in repo)
+
+### Step 1: Confirm Prometheus is loading the alert rule
+
+The repo's `infra/prometheus.yml` already references `rules.yml` and points at
+Alertmanager. If you started Prometheus following the Level 2 instructions
+exactly, you also need to mount `rules.yml` into the container:
+
+```bash
+docker rm -f swarmsre-prometheus 2>/dev/null
+
+docker run -d \
+  --name swarmsre-prometheus \
+  -p 9090:9090 \
+  -v "$(pwd)/infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
+  -v "$(pwd)/infra/rules.yml:/etc/prometheus/rules.yml:ro" \
+  prom/prometheus
+```
+
+Verify the rule loaded:
+
+```bash
+curl -s http://localhost:9090/api/v1/rules | grep HighPaymentErrorRate
+```
+
+### Step 2: Get a webhook URL for Alertmanager to send to
+
+Until the real `swarmsre-orchestrator` project exists, point Alertmanager at
+[webhook.site](https://webhook.site) so you can visually inspect the firing alert:
+
+1. Open https://webhook.site in your browser
+2. Copy the unique URL it gives you (e.g., `https://webhook.site/abc-123-...`)
+3. Edit `infra/alertmanager.yml` and replace the placeholder `REPLACE_ME_WITH_YOUR_UNIQUE_URL`
+
+### Step 3: Run Alertmanager
+
+```bash
+docker run -d \
+  --name swarmsre-alertmanager \
+  -p 9093:9093 \
+  -v "$(pwd)/infra/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
+  prom/alertmanager
+```
+
+### Step 4: Verify both containers are talking
+
+```bash
+docker ps --filter name=swarmsre
+
+curl -s -o /dev/null -w "Prometheus  HTTP %{http_code}\n" http://localhost:9090/-/ready
+curl -s -o /dev/null -w "Alertmgr    HTTP %{http_code}\n" http://localhost:9093/-/ready
+```
+
+### Step 5: Drive an alert end-to-end
+
+```bash
+# Sustained errors above threshold for ~70s
+for i in $(seq 1 35); do
+  curl -s -X POST "http://localhost:8080/api/simulate/error?count=5" > /dev/null
+  sleep 2
+done
+```
+
+Check alert progression:
+
+```bash
+# Current rate (should exceed 0.5)
+curl -s "http://localhost:9090/api/v1/query?query=rate(payment_errors_total[1m])"
+
+# Rule state (inactive → pending → firing)
+curl -s http://localhost:9090/api/v1/rules | grep -A2 HighPaymentErrorRate
+
+# Active alerts in Alertmanager
+curl -s http://localhost:9093/api/v2/alerts
+```
+
+Visit the webhook.site URL — you'll see the full Alertmanager payload arrive there.
+
+A reference run is captured in `docs/examples/sample-startup-and-alert-simulation.log`.
+
+### Step 6: Stop the alert pipeline
+
+```bash
+docker stop swarmsre-prometheus swarmsre-alertmanager
+```
+
+To restart:
+```bash
+docker start swarmsre-prometheus swarmsre-alertmanager
+```
+
+### What this unlocks
+
+When the real `swarmsre-orchestrator` project exists, replace the `webhook.site`
+URL in `alertmanager.yml` with `http://host.docker.internal:8081/webhook/prometheus`.
+The same alert that's firing today will then trigger the AI agent swarm. No
+changes needed in the target app.
+
+---
+
 ## Common API calls
 
 ### Trigger the incident webhook
@@ -301,10 +422,35 @@ curl -X POST http://localhost:8080/api/incident/webhook \
 
 Returns: `202 Accepted` with body `Incident received. Swarm deployed.`
 
+### Simulate payment errors (drives Prometheus alerts)
+
+```bash
+# One error
+curl -X POST http://localhost:8080/api/simulate/error
+
+# Many at once
+curl -X POST "http://localhost:8080/api/simulate/error?count=20"
+```
+
+Returns: `{"recorded": 20, "totalErrors": 20.0}`
+
+To trip the `HighPaymentErrorRate` alert (rate > 0.5 errors/sec for 30s), drive
+sustained traffic for ~70 seconds:
+
+```bash
+for i in $(seq 1 35); do
+  curl -s -X POST "http://localhost:8080/api/simulate/error?count=5" > /dev/null
+  sleep 2
+done
+```
+
 ### Check metrics
 
 ```bash
 curl -s http://localhost:8080/actuator/prometheus | head -30
+
+# Just the custom counter
+curl -s http://localhost:8080/actuator/prometheus | grep payment_errors_total
 ```
 
 ### Check actuator discovery
@@ -398,14 +544,25 @@ curl -X POST http://localhost:8080/api/incident/webhook \
   -H "Content-Type: application/json" \
   -d '{"incidentId":"INC-001","source":"prometheus","severity":"critical","service":"payment-service","summary":"High error rate"}'
 
-# Run Prometheus
+# Run Prometheus + Alertmanager (full Level 3 pipeline)
 docker run -d --name swarmsre-prometheus -p 9090:9090 \
   -v "$(pwd)/infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
+  -v "$(pwd)/infra/rules.yml:/etc/prometheus/rules.yml:ro" \
   prom/prometheus
+
+docker run -d --name swarmsre-alertmanager -p 9093:9093 \
+  -v "$(pwd)/infra/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
+  prom/alertmanager
+
+# Trip the alert
+for i in $(seq 1 35); do
+  curl -s -X POST "http://localhost:8080/api/simulate/error?count=5" > /dev/null
+  sleep 2
+done
 
 # Stop everything
 kill $(lsof -iTCP:8080 -sTCP:LISTEN -t)
-docker stop swarmsre-prometheus
+docker stop swarmsre-prometheus swarmsre-alertmanager
 ```
 
 ---
@@ -415,3 +572,4 @@ docker stop swarmsre-prometheus
 - `Swarm-Agents/Hackathon_Project/COMPONENTS.md` — full system architecture
 - `Swarm-Agents/Hackathon_Project/TEAM_PLAN.md` — three-person execution plan and contracts
 - `Swarm-Agents/Hackathon_Project/TEAM_QA.md` — design decisions and Q&A history
+- `docs/examples/sample-startup-and-alert-simulation.log` — reference output of a healthy run including a fired alert

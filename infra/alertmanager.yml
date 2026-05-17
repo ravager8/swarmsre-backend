@@ -1,0 +1,15 @@
+route:
+  receiver: 'swarmsre-orchestrator'
+  group_wait: 5s
+  group_interval: 30s
+  repeat_interval: 5m
+
+receivers:
+  - name: 'swarmsre-orchestrator'
+    webhook_configs:
+      # When the real orchestrator project exists, point this at it:
+      #   url: 'http://host.docker.internal:8081/webhook/prometheus'
+      # For now we use webhook.site to visually confirm alerts are firing.
+      # Replace this URL with your own webhook.site URL (https://webhook.site → "Your unique URL").
+      - url: 'https://webhook.site/REPLACE_ME_WITH_YOUR_UNIQUE_URL'
+        send_resolved: true

@@ -1,0 +1,88 @@
+Agents ready for the kill
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.14)
+
+2026-05-17T20:50:10.213+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.swarmsre.AgentApplication            : Starting AgentApplication v0.0.1-SNAPSHOT using Java 21.0.11 with PID 35131 (/Users/ranjan/claude-uses/swarmsre-backend/target/swarmsre-backend-0.0.1-SNAPSHOT.jar started by ranjan in /Users/ranjan/claude-uses/swarmsre-backend)
+2026-05-17T20:50:10.213+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.swarmsre.AgentApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-05-17T20:50:10.631+05:30  INFO 35131 --- [swarmsre-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-17T20:50:10.631+05:30  INFO 35131 --- [swarmsre-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-17T20:50:10.640+05:30  INFO 35131 --- [swarmsre-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 4 ms. Found 0 JPA repository interfaces.
+2026-05-17T20:50:10.893+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-17T20:50:10.899+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-17T20:50:10.899+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-05-17T20:50:10.911+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-17T20:50:10.911+05:30  INFO 35131 --- [swarmsre-backend] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 681 ms
+2026-05-17T20:50:11.011+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-17T20:50:11.081+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:swarmdb user=SA
+2026-05-17T20:50:11.082+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-17T20:50:11.100+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-17T20:50:11.124+05:30  INFO 35131 --- [swarmsre-backend] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-05-17T20:50:11.138+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-17T20:50:11.230+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-17T20:50:11.248+05:30  WARN 35131 --- [swarmsre-backend] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-17T20:50:11.254+05:30  INFO 35131 --- [swarmsre-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-05-17T20:50:11.371+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-17T20:50:11.373+05:30  INFO 35131 --- [swarmsre-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-17T20:50:11.439+05:30  INFO 35131 --- [swarmsre-backend] [           main] c.a.c.h.n.implementation.NettyUtility    : {"az.sdk.message":"The following Netty versions were found on the classpath and have a mismatch with the versions used by azure-core-http-netty. If your application runs without issue this message can be ignored, otherwise please align the Netty versions used in your application. For more information, see https://aka.ms/azsdk/java/dependency/troubleshoot.","azure-netty-version":"4.1.127.Final","azure-netty-native-version":"2.0.74.Final","classpath-netty-version-io.netty:netty-common":"4.1.132.Final","classpath-netty-version-io.netty:netty-handler":"4.1.132.Final","classpath-netty-version-io.netty:netty-handler-proxy":"4.1.132.Final","classpath-netty-version-io.netty:netty-buffer":"4.1.132.Final","classpath-netty-version-io.netty:netty-codec":"4.1.132.Final","classpath-netty-version-io.netty:netty-codec-http":"4.1.132.Final","classpath-netty-version-io.netty:netty-codec-http2":"4.1.132.Final","classpath-netty-version-io.netty:netty-transport-native-unix-common":"4.1.132.Final","classpath-netty-version-io.netty:netty-transport-native-epoll":"4.1.132.Final","classpath-netty-version-io.netty:netty-transport-native-kqueue":"4.1.132.Final","classpath-native-netty-version-io.netty:netty-tcnative-boringssl-static":"2.0.75.Final"}
+2026-05-17T20:50:11.544+05:30  WARN 35131 --- [swarmsre-backend] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-17T20:50:11.748+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2026-05-17T20:50:11.782+05:30  INFO 35131 --- [swarmsre-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-05-17T20:50:11.789+05:30  INFO 35131 --- [swarmsre-backend] [           main] com.swarmsre.AgentApplication            : Started AgentApplication in 1.759 seconds (process running for 2.069)
+2026-05-17T20:50:19.747+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-17T20:50:19.747+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-17T20:50:19.748+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-05-17T20:50:19.779+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 5
+2026-05-17T20:51:13.089+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 10
+2026-05-17T20:51:15.116+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-3] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 15
+2026-05-17T20:51:17.143+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-5] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 20
+2026-05-17T20:51:19.166+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-8] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 25
+2026-05-17T20:51:21.188+05:30  INFO 35131 --- [swarmsre-backend] [io-8080-exec-10] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 30
+2026-05-17T20:51:23.210+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-3] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 35
+2026-05-17T20:51:25.237+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-5] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 40
+2026-05-17T20:51:27.254+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-7] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 45
+2026-05-17T20:51:29.283+05:30  INFO 35131 --- [swarmsre-backend] [io-8080-exec-10] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 50
+2026-05-17T20:51:31.315+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-2] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 55
+2026-05-17T20:51:33.346+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-5] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 60
+2026-05-17T20:51:35.381+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-7] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 65
+2026-05-17T20:51:37.411+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-9] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 70
+2026-05-17T20:51:39.442+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-2] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 75
+2026-05-17T20:51:41.477+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-4] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 80
+2026-05-17T20:51:43.507+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-6] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 85
+2026-05-17T20:51:45.539+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-8] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 90
+2026-05-17T20:51:47.568+05:30  INFO 35131 --- [swarmsre-backend] [io-8080-exec-10] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 95
+2026-05-17T20:51:49.595+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-3] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 100
+2026-05-17T20:51:51.626+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-5] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 105
+2026-05-17T20:51:53.654+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-8] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 110
+2026-05-17T20:51:55.681+05:30  INFO 35131 --- [swarmsre-backend] [io-8080-exec-10] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 115
+2026-05-17T20:51:57.712+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-2] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 120
+2026-05-17T20:51:59.739+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-5] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 125
+2026-05-17T20:52:01.766+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-7] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 130
+2026-05-17T20:52:03.794+05:30  INFO 35131 --- [swarmsre-backend] [io-8080-exec-10] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 135
+2026-05-17T20:52:05.827+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-2] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 140
+2026-05-17T20:52:07.858+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-4] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 145
+2026-05-17T20:52:09.888+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-7] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 150
+2026-05-17T20:52:11.920+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-9] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 155
+2026-05-17T20:52:13.951+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-2] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 160
+2026-05-17T20:52:15.984+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-4] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 165
+2026-05-17T20:52:18.025+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-6] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 170
+2026-05-17T20:52:20.056+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-9] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 175
+2026-05-17T20:52:22.087+05:30  INFO 35131 --- [swarmsre-backend] [nio-8080-exec-1] c.s.simulator.IncidentSimulatorService   : Simulated 5 payment errors. Total so far: 180
+2026-05-17T20:53:24.283+05:30  INFO 35131 --- [swarmsre-backend] [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-05-17T20:53:24.289+05:30  INFO 35131 --- [swarmsre-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-05-17T20:53:24.304+05:30  INFO 35131 --- [swarmsre-backend] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-17T20:53:24.306+05:30  INFO 35131 --- [swarmsre-backend] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-17T20:53:24.307+05:30  INFO 35131 --- [swarmsre-backend] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

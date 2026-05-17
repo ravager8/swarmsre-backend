@@ -50,6 +50,8 @@ src/main/resources/application-secrets.*
 *.log
 logs/
 log/
+# Sample logs we deliberately commit as reference material
+!docs/examples/*.log
 
 ### OS noise ###
 .DS_Store

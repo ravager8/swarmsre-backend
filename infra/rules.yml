@@ -1,0 +1,12 @@
+groups:
+  - name: payment-alerts
+    rules:
+      - alert: HighPaymentErrorRate
+        expr: rate(payment_errors_total[1m]) > 0.5
+        for: 30s
+        labels:
+          severity: critical
+          service: payment-service
+        annotations:
+          summary: "Payment service error rate is above threshold"
+          description: "Error rate is {{ $value }} errors/sec on service {{ $labels.service }}"
