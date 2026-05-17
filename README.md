@@ -47,32 +47,100 @@ Each subproject has (or will have) its own README with build/run instructions sp
 
 ## Current implementation status
 
-| Component | Status |
-|-----------|--------|
-| `target-app/` | ✅ Webhook endpoint, Prometheus metrics endpoint, custom error counter, alert rules, full Prometheus + Alertmanager pipeline |
-| `orchestrator/` | ⚪ Not yet started — placeholder directory |
-| `frontend/` | ⚪ Not yet started — placeholder directory |
+### `target-app/` — ✅ runnable end-to-end
 
-`target-app/` is genuinely runnable today. See its README for full instructions including a sample log of a healthy run.
+| Capability | Status |
+|------------|--------|
+| `POST /api/incident/webhook` accepting canonical `IncidentEvent` | ✅ |
+| `POST /api/simulate/error` driving a custom counter | ✅ |
+| `/actuator/prometheus` endpoint with JVM, HTTP, disk, custom metrics | ✅ |
+| `infra/prometheus.yml` — scrape config + rule file refs | ✅ |
+| `infra/rules.yml` — `HighPaymentErrorRate` alert (rate > 0.5/s for 30s) | ✅ |
+| `infra/alertmanager.yml` — webhook receiver routing | ✅ |
+
+### `orchestrator/` — ✅ adapter layer complete, agent swarm pending
+
+| Capability | Status |
+|------------|--------|
+| Spring Boot scaffold on port 8081, health endpoint | ✅ |
+| Canonical `IncidentEvent`, `Severity`, `Source` types (per `project-docs/TEAM_PLAN.md` §4.1) | ✅ |
+| Modular adapter package layout (`adapter/inbound/`, `adapter/outbound/`) | ✅ |
+| **Inbound** — `POST /webhook/incident` (generic) | ✅ |
+| **Inbound** — `POST /webhook/prometheus` (Alertmanager v4 payload) with normalizer | ✅ |
+| **Outbound** — `MetricsClient` interface + `PrometheusMetricsClient` impl (`/api/v1/query`) | ✅ |
+| `IncidentPipeline.dispatch()` single entry point | 🟡 stub — logs the incident, no agent loop yet |
+| Agent swarm (LLM, tool calls, sub-agents) | ⚪ not started |
+| SSE controller for streaming agent steps to frontend | ⚪ not started |
+| GitHub PR creation tool | ⚪ not started |
+| Memory/RAG store for past incidents | ⚪ not started |
+
+### `frontend/` — ⚪ not yet started
+
+Placeholder directory. Owned by P3.
 
 ---
 
-## Running everything together (planned)
+## What's been tested end-to-end
 
-When all three projects exist, the demo flow will be:
+On 2026-05-17, the full chain `target-app → Prometheus → Alertmanager → orchestrator` was verified locally:
+
+| Layer | Verified |
+|-------|----------|
+| target-app counter `payment_errors_total` increments via `POST /api/simulate/error` | ✅ |
+| Prometheus scrapes target-app every 5s and computes `rate(payment_errors_total[1m])` | ✅ (observed 2.09/s under load) |
+| Prometheus alert rule `HighPaymentErrorRate` transitions `inactive → pending → firing` | ✅ |
+| Alertmanager picks up the firing alert and dispatches the configured webhook | ✅ |
+| Orchestrator receives `POST /webhook/prometheus`, parses Alertmanager v4 payload | ✅ |
+| Orchestrator's `PrometheusAlertNormalizer` converts to canonical `IncidentEvent` (severity from label, service from label, summary from annotation, ID from fingerprint) | ✅ |
+| Orchestrator's `IncidentPipeline.dispatch()` is invoked with the canonical event | ✅ |
+| Resolved-only Alertmanager payloads are acked but NOT dispatched to the pipeline | ✅ |
+| Orchestrator's outbound `PrometheusMetricsClient` URL shape returns valid query results | ✅ |
+
+What's still **untested** because not yet implemented:
+- Agent reasoning loop (no LLM call yet)
+- Tool execution from inside the pipeline
+- SSE streaming to a frontend
+- GitHub PR creation
+
+---
+
+## What's still to build
+
+In rough order of priority:
+
+1. **Agent swarm inside `IncidentPipeline.dispatch()`** — the orchestrator agent + Log Analyst + Metrics Agent + Fix-IT, with prompts and tool calls. This is the project's core value.
+2. **SSE controller** at `GET /events/{incidentId}` — streams `AGENT_STEP` / `PROPOSED_FIX` / `NEEDS_HUMAN` events. Contract in `project-docs/TEAM_PLAN.md` §4.
+3. **`LogsClient` outbound interface** + a target-app log endpoint to back it. Mirrors how `MetricsClient` works today.
+4. **GitHub PR creation tool** — final step of the Fix-IT agent, returns a PR URL.
+5. **Memory store** for past incidents (Cosmos emulator OR MongoDB — see `project-docs/COMPONENTS.md` §5 open decision).
+6. **Frontend** — `npx create-next-app frontend`, dashboard matching `project-docs/images/Image 4.png`, connects to the orchestrator's SSE stream.
+7. **Confidence scoring** — LLM self-rating + Java post-check, surfaced as a badge on the proposed fix (per `project-docs/TEAM_QA.md` Q4).
+
+---
+
+## Running everything together
+
+### What works today (verified)
 
 ```
-1. Start target-app                  (port 8080 — fake production service)
-2. Start Prometheus + Alertmanager    (ports 9090 / 9093 — observability stack)
-3. Start orchestrator                 (port 8081 — AI service)
-4. Start frontend                     (port 3000 — dashboard)
-5. Trigger an incident:               curl -X POST localhost:8080/api/simulate/error?count=20 (×35 over 70s)
-6. Prometheus fires alert → Alertmanager webhook → orchestrator wakes up
+1. Start target-app                       (port 8080)
+2. Start orchestrator                     (port 8081)
+3. Start Prometheus container             (port 9090, scrapes target-app, loads rules.yml)
+4. Start Alertmanager container           (port 9093, points webhook at orchestrator)
+5. Drive the alert:                       curl /api/simulate/error?count=5  ×35 over 70s
+6. Alert fires → Alertmanager webhook → orchestrator pipeline logs the incident
+```
+
+Concrete commands are in `target-app/README.md` (Levels 1–3) and `orchestrator/README.md`.
+
+The placeholder URL in `target-app/infra/alertmanager.yml` must be replaced for step 4 — either with the orchestrator's webhook (`http://host.docker.internal:8081/webhook/prometheus`) or a `webhook.site` URL for visual inspection.
+
+### What will work once agents are added
+
+```
 7. Orchestrator runs the agent swarm, streams progress to frontend over SSE
 8. Frontend shows proposed fix; SRE clicks "Approve" → GitHub PR created
 ```
-
-Today only steps 1, 2, and 5 work end-to-end. Steps 3, 4, 6, 7, 8 land as we build out `orchestrator/` and `frontend/`.
 
 ---
 
