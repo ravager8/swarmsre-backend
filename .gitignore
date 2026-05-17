@@ -60,3 +60,6 @@ Thumbs.db
 ### Local ignores (per-developer) ###
 # Use this for anything you want ignored only on your machine
 .gitignore.local
+
+### Tooling state (per-developer, not for the repo) ###
+.claude-flow/
